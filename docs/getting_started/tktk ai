@@ -1,0 +1,23 @@
+from moviepy.editor import VideoClip, AudioFileClip
+import numpy as np
+
+audio = AudioFileClip("output_phonk.wav")
+duration = audio.duration
+
+def make_frame(t):
+    # Fond noir
+    frame = np.zeros((720, 1280, 3), dtype=np.uint8)
+    
+    # Ajouter un cercle qui pulse avec le beat
+    radius = int(50 + 30 * np.sin(2*np.pi*2*t))
+    color = (255, 0, 255)  # violet neon
+    cv2.circle(frame, (640, 360), radius, color, -1)
+    
+    # Ajouter glitch aléatoire
+    if np.random.rand() > 0.95:
+        frame[:, np.random.randint(0,1280):, :] = frame[:, np.random.randint(0,1280):, ::-1]
+    return frame
+
+video = VideoClip(make_frame, duration=duration)
+video = video.set_audio(audio)
+video.write_videofile("phonk_video.mp4", fps=30)
